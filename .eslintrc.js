@@ -30,6 +30,7 @@ module.exports = {
     project: './tsconfig.json',
   },
   rules: {
+    'no-console': 'off',
     'react/prop-types': 'off',
     'no-unused-vars': ['error', { argsIgnorePattern: '^_' }],
     '@typescript-eslint/no-unused-vars': ['error', { argsIgnorePattern: '^_' }],

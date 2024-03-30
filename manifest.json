@@ -1,5 +1,5 @@
 {
-  "name": "sample plugin",
+  "name": "Sticky Notes",
   "id": "1349654689308803915",
   "api": "1.0.0",
   "main": "dist/plugin.js",
