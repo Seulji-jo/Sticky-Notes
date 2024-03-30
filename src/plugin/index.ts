@@ -14,12 +14,28 @@ function isPayload(payload: unknown): payload is PluginMessagePayload {
   );
 }
 
-async function loadFonts() {
-  // roboto 폰트 가져오고
-  await figma.loadFontAsync({
+const fontArray = [
+  {
+    family: 'Inter',
+    style: 'Regular',
+  },
+  {
     family: 'Roboto',
     style: 'Regular',
-  });
+  },
+];
+
+async function loadFonts() {
+  // roboto 폰트 가져오고
+  // await figma.loadFontAsync({
+  //   family: 'Inter',
+  //   style: 'Regular',
+  // });
+  // await figma.loadFontAsync({
+  //   family: 'Roboto',
+  //   style: 'Regular',
+  // });
+  fontArray.forEach(async (font) => figma.loadFontAsync(font));
 }
 
 function generateRandomQuote({ randomQuote }: PluginMessagePayload) {
@@ -28,24 +44,40 @@ function generateRandomQuote({ randomQuote }: PluginMessagePayload) {
   console.log('curr page node', figma.currentPage);
   console.log('선택하는 노드들의 배열', figma.currentPage.selection);
 
-  // 1. 현재 사용자가 선택한 노드를 가지고 와서
   const currentSelectionNode = figma.currentPage.selection[0];
+  console.log('선택하는 노드', currentSelectionNode);
 
-  // 2. 사용자가 선택한 노드가 텍스트 노드인지 확인하고
   if (currentSelectionNode?.type === 'TEXT') {
     currentSelectionNode.fontName = {
-      family: 'Roboto',
+      family: 'Inter',
       style: 'Regular',
     };
-    // 2-1. 텍스트 노드라면 내용을 인용문으로 대체합니다.
     currentSelectionNode.characters = `${randomQuote.text} - ${
       randomQuote.author || 'Unknown'
     }`;
   } else {
-    // 2-2. 텍스트 노드가 아니라면 에러를 던집니다.
-    throw new Error('No text node is selected');
+    const rect = figma.createRectangle();
+    const text = figma.createText();
+
+    rect.x = 50;
+    rect.y = 50;
+    text.x = 50;
+    text.y = 50;
+    rect.resize(200, 100);
+    text.resize(180, 80);
+    rect.fills = [{ type: 'SOLID', color: { r: 1, g: 0, b: 0 } }];
+    text.characters = `${randomQuote.text} - ${
+      randomQuote.author || 'Unknown'
+    }`;
+    text.fontName = {
+      family: 'Roboto',
+      style: 'Regular',
+    };
+    text.fontSize = 18;
+    text.fills = [{ type: 'SOLID', color: { r: 1, g: 1, b: 1 } }];
   }
 }
+
 loadFonts().then(() => {
   figma.ui.onmessage = (payload: unknown) => {
     const callbackMap: Record<PluginAction, PluginCallbackFunction> = {
